@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, CSSProperties } from 'react';
 import Image from 'next/image';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
@@ -13,7 +14,75 @@ import FlourishV5 from '@/app/componentes/componente5';
 import FlourishV6 from '@/app/componentes/componente6';
 import FlourishV7 from '@/app/componentes/componente7';
 
+{/* 0 a 99.01% */}
 
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const startValue = 0;
+    const endValue = 99.01;
+    const duration = 2; // duración en segundos
+
+    let startTimestamp = null;
+
+    const animate = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = (timestamp - startTimestamp) / (duration * 1000);
+      const currentCount = Math.min(
+        startValue + progress * (endValue - startValue),
+        endValue
+      );
+      setCount(currentCount.toFixed(2));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, []);
+
+  return (
+    <div style={containerStyle}>
+      <motion.div
+        style={countStyle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        {count}%
+      </motion.div>
+      <div style={textStyle}>de las emisiones anuales mundiales son de CO2</div>
+    </div>
+  );
+};
+
+const containerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  height: '100vh',
+  backgroundColor: '#000',
+  color: '#fff',
+  fontFamily: 'Protest_Guerrilla, sans-serif', // Aquí puedes cambiar la tipografía según necesites
+  paddingLeft: '80px',
+};
+
+const countStyle: CSSProperties = {
+  fontSize: '8rem',
+  fontWeight: 'bold',
+  color: '#e60000', // color rojo similar al de la imagen
+  fontFamily: 'Protest_Guerrilla, sans-serif', // Cambia a la fuente específica si la tienes disponible
+};
+
+const textStyle: CSSProperties = {
+  fontSize: '1.5rem',
+  fontFamily: 'Protest_Guerrilla, sans-serif',
+  color: '#fff',
+  marginTop: '1rem',
+};
 
       const AttentionPoster: React.FC = () =>  {
         // Estado para controlar el scroll
@@ -46,6 +115,29 @@ import FlourishV7 from '@/app/componentes/componente7';
       window.removeEventListener('wheel', handleScroll);
     };
   }, [isInsideSection]);
+
+useEffect(() => {
+  const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      setIsInsideSection(entry.isIntersecting);
+    });
+  };
+
+  const observer = new IntersectionObserver(handleIntersection, {
+    root: null,
+    threshold: 0.1, // Ajustá este valor según lo que consideres como estar "dentro" de la sección
+  });
+
+  if (sectionRef.current) {
+    observer.observe(sectionRef.current);
+  }
+
+  return () => {
+    if (sectionRef.current) {
+      observer.unobserve(sectionRef.current);
+    }
+  };
+}, []);
 
       // Función para actualizar el estado de scroll
       const handleScroll = () => {
@@ -276,6 +368,9 @@ import FlourishV7 from '@/app/componentes/componente7';
         </section>
       </ParallaxProvider>
 
+
+{/* LLAMO AL CONTADOR DE CO2 */ }
+<Counter />
 
 
     {/*////////// VISUALIZACION 1 //////////*/}
